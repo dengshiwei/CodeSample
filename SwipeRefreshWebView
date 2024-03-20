@@ -1,0 +1,87 @@
+import android.content.Context
+import android.util.AttributeSet
+import android.view.MotionEvent
+import android.webkit.WebView
+// 来源：https://juejin.cn/post/7101150276626677774，记录 SwipeRefreshLayout 下拉刷新与 Webview 中的 div 滑动冲突的解决方案
+/**
+ * @author : litao
+ * @email : onresume@live.com
+ * @date : 2022/5/24 11:16 上午
+ */
+internal class SwipeRefreshWebView constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) : WebView(context, attrs, defStyleAttr) {
+
+
+    private var overScrolledY = false
+    private var startY  = 0f
+    private var refreshEnable = false
+    private var isPullDown = false
+
+    override fun onOverScrolled(scrollX: Int, scrollY: Int, clampedX: Boolean, clampedY: Boolean) {
+        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
+        if (clampedY){
+            overScrolledY = true
+        }
+    }
+
+    override fun overScrollBy(
+        deltaX: Int,
+        deltaY: Int,
+        scrollX: Int,
+        scrollY: Int,
+        scrollRangeX: Int,
+        scrollRangeY: Int,
+        maxOverScrollX: Int,
+        maxOverScrollY: Int,
+        isTouchEvent: Boolean
+    ): Boolean {
+        //判断当前over scroll 方向
+        isPullDown = deltaY < 0
+
+        return super.overScrollBy(deltaX,
+            deltaY,
+            scrollX,
+            scrollY,
+            scrollRangeX,
+            scrollRangeY,
+            maxOverScrollX,
+            maxOverScrollY,
+            isTouchEvent)
+    }
+
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+
+        when (event?.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                startY = event.y
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val diffY = event.y - startY
+                if (diffY < 0){
+                    overScrolledY = false
+                    refreshEnable = false
+                    setRefreshEnable(false)
+                }
+
+                if (overScrolledY && !refreshEnable && isPullDown) {
+                    refreshEnable = true
+                    setRefreshEnable(true)
+                    val obtain = MotionEvent.obtain(event)
+                    obtain.action = MotionEvent.ACTION_DOWN
+                    dispatchTouchEvent(obtain)
+                    (parent as TDRefreshLayout).dispatchTouchEvent(obtain)
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    fun setRefreshEnable(enable : Boolean){
+        // TODO: you refresh layout enable code
+    }
+
+}
