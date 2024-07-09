@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>有很多button的页面</title>
+  <script>
+    function createRandomCode(len = 16) {
+      if (typeof len !== 'number') {
+        console.error('len必须为数字！')
+        return false
+      }
+      let str = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+      let result = ''
+      for (let i = 0; i < len; i++) {
+        let target = parseInt(Math.random() * str.length + 1)
+        let character = str.charAt(target)
+        result += character
+      }
+      console.log('本次创建的结果是', result, '长度是', result.length)
+      return result
+    }
+    (function (para) {
+      var p = para.sdk_url, n = para.name, w = window, d = document, s = 'script', x = null, y = null;
+      w['sensorsDataAnalytic201505'] = n;
+      w[n] = w[n] || function (a) { return function () { (w[n]._q = w[n]._q || []).push([a, arguments]); } };
+      var ifs = ['track', 'quick', 'register', 'registerPage', 'registerOnce', 'clearAllRegister', 'trackSignup', 'trackAbtest', 'setProfile', 'setOnceProfile', 'appendProfile', 'incrementProfile', 'deleteProfile', 'unsetProfile', 'identify', 'login', 'logout', 'trackLink', 'clearAllRegister'];
+      for (var i = 0; i < ifs.length; i++) {
+        w[n][ifs[i]] = w[n].call(null, ifs[i]);
+      }
+      if (!w[n]._t) {
+        x = d.createElement(s), y = d.getElementsByTagName(s)[0];
+        x.async = 1;
+        x.src = p;
+        w[n].para = para;
+        y.parentNode.insertBefore(x, y);
+      }
+    })({
+      sdk_url: 'https://static.sensorsdata.cn/sdk/latest/sensorsdata.min.js',
+      name: 'sensors',
+      use_app_track: true,
+      app_js_bridge: {
+        white_list: ['https://sdk-product-datasink.sensorsdata.cn/sa?project=chuqiangsheng', 'http://10.129.20.62:8106/sa?project=demo', 'https://sdk-product-datasink.sensorsdata.cn/sa?project=demo', 'http://10.129.20.65:8106/sa?project=test_091']
+      },
+      server_url: 'https://sdk-product-datasink.sensorsdata.cn/sa?project=dengshiwei',
+      heatmap: {
+        clickmap: 'default',
+        scroll_notice_map: 'not_collect'
+      }
+    });
+    sensors.registerPage(
+      {
+        paltTypeJS: [],
+      }
+    );
+    sensors.quick('autoTrack', {
+      platform: 'H5',
+    });
+    // sensors.track('loadJSSDK')
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      overflow-y: scroll;
+    }
+
+    .btn {
+      margin: 20px auto 20px auto;
+      display: block;
+      width: 60%;
+      height: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <button class="btn" id="btn1">JS 调用 OC</button>
+  <button class="btn" id="btn2">登录</button>
+  <button class="btn" id="btn3">退出登录</button>
+  <button class="btn" id="btn4">ItemSet</button>
+  <button class="btn" id="btn5">track 事件</button>
+  <button class="btn" id="btn6">bind</button>
+  <button class="btn" id="btn7">unbind</button>
+  <button class="btn" id="btn8">appendProfile</button>
+  <button class="btn" id="btn9">普通 JS 按钮，点击测试</button>
+  <button class="btn" id="btn10">LoginWithKey</button>
+  <div name='test' id="btn12" data-sensors-click>我是测试元素</div>
+  <script>
+    (function () {
+      document.querySelector("#btn1").addEventListener('click', function () {
+        result = window.SensorsData_App_Visual_Bridge.sensorsdata_call_app_visualConfig();
+        alert(result);
+      })
+      document.querySelector("#btn2").addEventListener('click', function () {
+        console.log('登录')
+        sensors.login(createRandomCode())
+      })
+      document.querySelector("#btn3").addEventListener('click', function () {
+        console.log('退出登录')
+        sensors.logout()
+      })
+      document.querySelector("#btn10").addEventListener('click', function () {
+        console.log('loginWithKey')
+        sensors.loginWithKey('testKey','testValue')
+      })
+      document.querySelector("#btn4").addEventListener('click', function () {
+        sensors.setItem("food", "2", { name: "玉米", flavour: "甜" });
+      })
+      document.querySelector("#btn5").addEventListener('click', function () {
+        sensors.track('BuyProduct', {
+          ProductName: "MacBook Pro",
+          ProductPrice: 123.45,
+          IsAddedToFav: false
+          // $time: "自定义时间，格式为字符串"
+        });
+      })
+      document.querySelector("#btn6").addEventListener('click', function () {
+        sensors.bind(sensors.IDENTITY_KEY.MOBILE, '13800000000');
+      })
+      document.querySelector("#btn7").addEventListener('click', function () {
+        // sensors.setProfile({ email: '123456@qbc.cdd' });
+        sensors.unbind(sensors.IDENTITY_KEY.MOBILE, '13800000000');
+      })
+      document.querySelector("#btn8").addEventListener('click', function () {
+        sensors.appendProfile({ testArray: ["123", "456"] });
+      })
+      document.querySelector("#btn9").addEventListener('click', function () {
+      })
+    }())
+
+    function add(a, b) {
+      return a + b;
+    }
+  </script>
+</body>
+
+</html>
