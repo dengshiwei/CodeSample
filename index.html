@@ -128,11 +128,10 @@
         });
       })
       document.querySelector("#btn6").addEventListener('click', function () {
-        sensors.bind('mobile', '13800000000');
+        sensors.bind("$identity_mobile", "1380000000");
       })
       document.querySelector("#btn7").addEventListener('click', function () {
-        // sensors.setProfile({ email: '123456@qbc.cdd' });
-        sensors.unbind('mobile', '13800000000');
+        sensors.unbind("$identity_mobile","1380000000")
       })
       document.querySelector("#btn8").addEventListener('click', function () {
         sensors.appendProfile({ testArray: ["123", "456"] });
