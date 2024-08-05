@@ -1,0 +1,126 @@
+package com.data.project;
+
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+public class LogToFileUtil {
+
+    private static final String TAG = "LogToFileUtil";
+    private static final String LOG_FILE_NAME = "data_log.txt";
+    private static boolean isInitialized = false;
+    private static Context sContext;
+    static Uri uri = null;
+    // 初始化日志文件
+    public static void init(Context context) {
+        if (isInitialized) {
+            return;
+        }
+        sContext = context;
+        uri = getUri(context, LOG_FILE_NAME);
+        if (uri == null) {
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Downloads.DISPLAY_NAME, LOG_FILE_NAME);
+            values.put(MediaStore.Downloads.MIME_TYPE, "text/plain");
+            values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                uri = sContext.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            }
+        }
+
+        isInitialized = true;
+    }
+
+    // 写日志到文件
+    public static void logToFile(String logLevel, String tag, String message) {
+        if (!isInitialized) {
+            Log.e(TAG, "LogToFileUtil is not initialized. Call init() method first.");
+            return;
+        }
+        StringBuilder builder = new StringBuilder();
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        builder.append(timeStamp)
+                .append(" ")
+                .append(logLevel)
+                .append("/")
+                .append(tag)
+                .append(": ")
+                .append(message)
+                .append("\n");
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            try (OutputStream outputStream = sContext.getContentResolver().openOutputStream(uri, "wa")) {
+                try {
+                    outputStream.write(builder.toString().getBytes());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static Uri getUri(Context context, String fileName) {
+        Uri fileUri = null;
+        String[] projection = {MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DISPLAY_NAME};
+        String selection = MediaStore.MediaColumns.DISPLAY_NAME + "=?";
+        String[] selectionArgs = new String[]{fileName};
+
+        Cursor cursor = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            cursor = context.getContentResolver().query(
+                    MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null);
+        }
+
+        if (cursor != null && cursor.moveToFirst()) {
+            int idIndex = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID);
+            long id = cursor.getLong(idIndex);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                fileUri = ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI, id);
+            }
+            cursor.close();
+        }
+
+        return fileUri;
+    }
+
+    // 调试日志
+    public static void d(String tag, String message) {
+        Log.d(tag, message);
+        logToFile("DEBUG", tag, message);
+    }
+
+    // 错误日志
+    public static void e(String tag, String message) {
+        Log.e(tag, message);
+        logToFile("ERROR", tag, message);
+    }
+
+    // 信息日志
+    public static void i(String tag, String message) {
+        Log.i(tag, message);
+        logToFile("INFO", tag, message);
+    }
+}
