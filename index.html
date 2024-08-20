@@ -100,7 +100,18 @@
   <a href="sa0d9dcc16://sensors">Open HarmonyOS App with Custom URI Scheme</a>
   <br>
    <a href="https://dengshiwei.github.io/CodeSample/app">Open AppLink</a>  <br>
+  <button onclick='goToLink()'>scheme 立即下载</button> <br>
+  <button onclick='goToLinkHttp()'>http 立即下载</button> <br>
   <div name='test' id="btn12" data-sensors-click>我是测试元素</div>
+  <script>
+      function goToLink() {
+          window.open('sa0d9dcc16://sensors')
+      }
+
+      function goToLinkHttp() {
+          window.open('https://dengshiwei.github.io/CodeSample/app')
+      }
+  </script>
   <script>
     (function () {
       document.querySelector("#btn1").addEventListener('click', function () {
