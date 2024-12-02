@@ -102,6 +102,7 @@
    <a href="https://mi-u.me/app">Open AppLink 在 a 标签中打开 App</a>  <br> <br><br><br>
   <button onclick='goToLink()'>scheme 立即打开App</button> <br> <br><br><br>
   <button onclick='goToLinkHttp()'>http 立即打开App</button> <br> <br><br><br>
+  <button onclick='goToLinkSensors()'>模拟Sensors短链</button> <br> <br><br><br>
   <div name='test' id="btn12" data-sensors-click>我是测试元素</div>
   <script>
       function goToLink() {
@@ -110,6 +111,10 @@
 
       function goToLinkHttp() {
           window.open('https://mi-u.me/app')
+      }
+    
+      function goToLinkSensors() {
+          window.open('sa0d9dcc16://sensorsdata?feature_code=sac67bbbeeaGenoeLafw&utm_source=sensorssource&utm_medium=sensorsmedium')
       }
   </script>
   <script>
